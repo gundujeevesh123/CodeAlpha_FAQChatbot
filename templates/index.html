@@ -1,0 +1,133 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Keyword AI Chatbot</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+<div class="container">
+
+<h1>Smart AI Product Assistant</h1>
+
+<div class="product-grid">
+
+{% for product in products.keys() %}
+
+<div class="card" onclick="selectProduct('{{ product }}')">
+    {{ product }}
+</div>
+
+{% endfor %}
+
+</div>
+
+<div class="faq-section">
+
+<h2 id="selectedProduct">Select a Product</h2>
+
+<div id="faqList"></div>
+
+</div>
+
+<div class="chat-section">
+
+<h2>AI Assistant</h2>
+
+<div class="chat-box" id="chatMessages"></div>
+
+<input
+type="text"
+id="questionInput"
+placeholder="Ask any product-related question..."
+>
+
+<button onclick="askAI()">Ask AI</button>
+
+</div>
+
+</div>
+
+<script>
+
+const productData = {{ products|tojson }};
+
+let currentProduct = "";
+
+function selectProduct(product) {
+
+    currentProduct = product;
+
+    document.getElementById("selectedProduct").innerText =
+        "Selected Product: " + product;
+
+    const faqList = document.getElementById("faqList");
+
+    faqList.innerHTML = "";
+
+    productData[product].sample_faqs.forEach(faq => {
+
+        faqList.innerHTML += `
+            <div class="faq-item">
+                <h4>Q: ${faq[0]}</h4>
+            </div>
+        `;
+    });
+}
+
+async function askAI() {
+
+    const question =
+        document.getElementById("questionInput").value;
+
+    if (!currentProduct) {
+
+        alert("Please select a product first.");
+        return;
+    }
+
+    const chatBox =
+        document.getElementById("chatMessages");
+
+    chatBox.innerHTML += `
+        <div class="user-message">${question}</div>
+    `;
+
+    chatBox.innerHTML += `
+        <div class="typing">AI is analyzing your question...</div>
+    `;
+
+    const response = await fetch("/ask", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+            question: question,
+            product: currentProduct
+        })
+    });
+
+    const data = await response.json();
+
+    document.querySelector(".typing").remove();
+
+    chatBox.innerHTML += `
+        <div class="bot-message">
+            ${data.answer}
+        </div>
+    `;
+
+    document.getElementById("questionInput").value = "";
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+</script>
+
+</body>
+</html>
