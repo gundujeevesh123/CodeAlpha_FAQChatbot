@@ -22,6 +22,14 @@ An NLP-powered FAQ Chatbot that intelligently matches user questions with the mo
 - TF-IDF Vectorization
 - Cosine Similarity
 
+## How It Works
+
+1. User enters a question.
+2. NLP preprocessing cleans the text.
+3. TF-IDF converts text into vectors.
+4. Cosine Similarity finds the closest FAQ.
+5. The chatbot returns the most relevant answer.
+
 ## Installation
 
 ```bash
